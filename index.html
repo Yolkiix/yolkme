@@ -259,8 +259,6 @@ box-shadow:2px 0 0 #e7e3d8,4px 0 0 #d4d0c4,6px 0 0 #e7e3d8,20px 30px 50px rgba(0
 }
 
 /* ===== VOL.02 / VOL.03 additions (same tokens as the rest of the site) ===== */
-.fig svg{display:block;width:100%;height:100%;max-width:100%;max-height:100%}
-.single .fig svg{height:auto}
 .chips{display:flex;flex-wrap:wrap;gap:.5em}
 .chips span{border:1px solid var(--ink);padding:.5em .85em;font:.62em var(--mono);letter-spacing:.12em;text-transform:uppercase}
 .ds{border-top:1px solid var(--ink);padding-top:1em;display:flex;justify-content:space-between;align-items:baseline;gap:1em;flex-wrap:wrap}
@@ -294,9 +292,11 @@ box-shadow:2px 0 0 #e7e3d8,4px 0 0 #d4d0c4,6px 0 0 #e7e3d8,20px 30px 50px rgba(0
 .pc.ctr .k{justify-content:center}
 .pc.ctr h2,.pc.ctr .tg,.pc.ctr .lead,.pc.ctr .note,.pc.ctr .cst,.pc.ctr .cap h3{text-align:center}
 .pc.ctr .lead{max-width:26em}
-.pc.ctr .fg{width:100%;align-self:stretch}
+.pc.ctr .vs{width:100%;flex:none;display:flex;justify-content:center}
+.vsi{width:min(100%,24em);aspect-ratio:3/2;display:flex;align-items:center;justify-content:center}
+.vsi img{display:block;width:100%;height:100%;object-fit:contain}
+.vph{width:100%;height:100%;display:grid;place-items:center;text-align:center;line-height:1.9;color:#7d7a71;background:#ebe7dc;border:1px solid #cfccc2;font:.6em var(--mono);letter-spacing:.14em;text-transform:uppercase}
 .pc.ctr .chips{justify-content:center}
-.pc.ctr .fig figcaption{text-align:center}
 .pc.ctr .ds,.pc.ctr .steps,.pc.ctr .cap,.pc.ctr .cmp,.pc.ctr .ba,.pc.ctr .cf,.pc.ctr .cats,.pc.ctr>ul{width:100%;max-width:26em}
 .pc.ctr .ds{flex-direction:column;align-items:center;gap:.5em;text-align:center}
 .pc.ctr .cf{margin-inline:auto}
@@ -411,29 +411,22 @@ const WORK=[['—','Deliverables'],['—','Reach'],['—','Result']];
 
 /* ===== VOL.02 BEYOND NUMBERS — custom pages. No uploads needed: every visual is drawn in code, no real dashboards. =====
    Average daily spend: set  ds:'To be updated'  (default), a approved range like  ds:'USD 500–1,000 / day (approved range)',  or  ds:null  to hide the field. */
-/* ============ VOL.02 IMAGE SETTINGS — EDIT HERE ============
-   Each of the four Paid Advertising visuals is controlled by one entry below.
-   • To use your own picture: upload it to PAID_IMG_DIR (images/paid-media/) and type its file name in  file:'...'
-     (or type a full path such as 'images/paid-media/my-visual.jpg').  Example:  file:'meta-ads-1.jpg'
-   • Leave  file:''  to keep the built-in conceptual illustration. If a file is missing or fails to load, the built-in illustration is shown instead.
-   • alt = description for screen readers · cap = small caption under the picture (cap:'' hides it).
-   • Pictures are never cropped or stretched: they scale down to fit the page and keep their own aspect ratio (any ratio works).
-   • Do not publish real Ads Manager screenshots, budgets or client data. */
-const PAID_IMG_DIR='images/paid-media/';
+/* ============ VOL.02 IMAGES — EDIT HERE ============
+   Four identical image slots, one per chapter. All four share the same display size and 3:2 ratio.
+   Upload your design to the folder below using EXACTLY these file names (or change the path here).
+   Design size: 1800 × 1200 px (3:2). Other ratios still work: they are never cropped or stretched, only letterboxed.
+   Until a file exists, a neutral grey placeholder is shown. (.png / .webp with the same name are also picked up.) */
 const PAID_IMG={
- meta:{file:'',alt:'Meta Ads — conceptual visual',cap:'Meta Ads visual'},               /* suggested name: meta-ads-1.jpg */
- tiktok:{file:'',alt:'TikTok Ads — conceptual visual',cap:'TikTok Ads visual'},         /* suggested name: tiktok-ads-1.jpg */
- google:{file:'',alt:'Google Ads — conceptual visual',cap:'Google Ads visual'},         /* suggested name: google-ads-1.jpg */
- optimization:{file:'',alt:'Optimization workflow infographic',cap:'Optimization workflow'} /* suggested name: optimization-tracking-1.jpg */
+ meta:{src:'images/paid-media/meta-ads.jpg',label:'Meta Ads',alt:'Meta Ads visual'},
+ tiktok:{src:'images/paid-media/tiktok-ads.jpg',label:'TikTok Ads',alt:'TikTok Ads visual'},
+ google:{src:'images/paid-media/google-ads.jpg',label:'Google Ads',alt:'Google Ads visual'},
+ optimization:{src:'images/paid-media/optimization-tracking.jpg',label:'Optimization & Tracking',alt:'Optimization & Tracking visual'}
 };
-const PAID_CAP={meta:'Conceptual illustration · not a real account',tiktok:'Conceptual illustration · not a real ad',google:'Conceptual illustration · not a real account',optimization:'Original workflow · not a platform screenshot'};
-const paidSrc=k=>{const f=PAID_IMG[k].file;return f?(f.includes('/')?f:PAID_IMG_DIR+f):''};
-function paidFb(el){const m=el.closest('.m');if(m)m.innerHTML=PAID_SVG[el.dataset.k]}
-function vis(k,svg,lbl){const c=PAID_IMG[k],src=paidSrc(k);
- if(src)return `<div class="fg"><figure class="fig"><div class="m"><img src="${src}" alt="${c.alt}" data-k="${k}" loading="lazy" onerror="paidFb(this)"></div>${c.cap?`<figcaption class="mono">${c.cap}</figcaption>`:''}</figure></div>`;
- return fig(svg,PAID_CAP[k],lbl)}
+function paidErr(el){const x=['jpg','png','webp'],m=el.src.match(/\.(\w+)$/),i=m?x.indexOf(m[1].toLowerCase()):-1;
+ if(i>=0&&i<x.length-1){el.src=el.src.replace(/\.\w+$/,'.'+x[i+1]);return}
+ el.parentNode.innerHTML=`<div class="vph"><span>${el.dataset.l}<br>3:2 · 1800 × 1200 · add file</span></div>`}
+const paidSlot=k=>{const c=PAID_IMG[k];return `<div class="vs"><div class="vsi"><img src="${c.src}" alt="${c.alt}" data-l="${c.label}" onerror="paidErr(this)"></div></div>`};
 const kk=t=>`<div class="mono k"><i></i>${t}</div>`;
-const fig=(svg,cap,lbl)=>`<div class="fg"><figure class="fig" role="img" aria-label="${lbl}"><div class="m">${svg}</div><figcaption class="mono">${cap}</figcaption></figure></div>`;
 const head=(c,i,m,body)=>`<div class="pc op ctr v${i%2}">${kk(`Chapter ${pad(i+1)} · ${m.sub}`)}<div class="mk">${c.mk}</div><h2>${c.n}</h2><p class="tg">${c.t}</p>${body}</div>`;
 const dsf=c=>c.ds===null?'':`<div class="ds"><span class="mono">Average Daily Spend:</span><b>${c.ds||'To be updated'}</b></div>`;
 const chips=a=>`<div class="chips">${a.map(x=>`<span>${x}</span>`).join('')}</div>`;
@@ -441,52 +434,24 @@ const CAT=['Finance','Gaming','Entertainment &amp; Interactive'];
 const ovw=(c,lead,tags)=>`<div class="pc ctr">${kk('Platform overview')}<p class="lead">${lead}</p>${chips(tags)}${dsf(c)}<p class="mono note">[Replace: market, period and your role — confirmed details only. Spend: approved range or leave as is.]</p></div>`;
 const lis=a=>a.map(x=>`<li>${x}</li>`).join('');
 const cap=(h,p,l)=>`<div class="cap"><h3>${h}</h3>${p?`<p>${p}</p>`:''}${l?`<ul>${lis(l)}</ul>`:''}</div>`;
-const sty='font-family:var(--serif)';
-const SV_META=`<svg viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#161614" stroke-opacity=".18"><circle cx="220" cy="150" r="96"/><circle cx="220" cy="150" r="136"/></g>
-<g stroke="#161614" stroke-opacity=".35" stroke-dasharray="3 5" fill="none"><path d="M92 76L160 128M348 76L280 128M220 232V190"/></g>
-<path d="M118 150C118 98 190 98 220 150C250 202 322 202 322 150C322 98 250 98 220 150C190 202 118 202 118 150Z" fill="none" stroke="#1877f2" stroke-width="15" stroke-linejoin="round"/>
-<g><rect x="52" y="28" width="62" height="62" rx="15" fill="#161614"/><circle cx="83" cy="59" r="15" fill="none" stroke="#f4f1ea" stroke-width="3"/><path d="M83 51v16M78 55.5h8a3 3 0 010 6h-6a3 3 0 000 6h8" stroke="#f4f1ea" stroke-width="2" fill="none"/>
-<rect x="326" y="28" width="62" height="62" rx="15" fill="#f4f1ea" stroke="#161614" stroke-width="2"/><rect x="341" y="49" width="32" height="20" rx="10" fill="#161614"/><path d="M351 55v8M347 59h8" stroke="#f4f1ea" stroke-width="2"/><circle cx="364" cy="57" r="2" fill="#f4f1ea"/><circle cx="367" cy="62" r="2" fill="#f4f1ea"/>
-<rect x="189" y="226" width="62" height="62" rx="15" fill="#1877f2"/><path d="M212 245l24 12-24 12z" fill="#f4f1ea"/></g>
-<g font-family="DM Mono,monospace" font-size="8.5" letter-spacing="1.4" fill="#77756d" text-anchor="middle"><text x="83" y="106">FINANCE</text><text x="357" y="106">GAMING</text><text x="220" y="26" fill="#161614">APP CAMPAIGNS</text><text x="320" y="262" text-anchor="start">ENTERTAINMENT</text></g></svg>`;
-const SV_TT=`<svg viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg"><g font-family="DM Mono,monospace" font-size="8.5" letter-spacing="1.4" fill="#77756d" text-anchor="middle">
-<rect x="154" y="12" width="132" height="276" rx="24" fill="#161614"/><rect x="164" y="22" width="112" height="256" rx="17" fill="none" stroke="#f4f1ea" stroke-opacity=".25"/>
-<g fill="none" stroke-linecap="round" stroke-width="7"><path d="M217 98v62c0 10-8 17-18 17s-16-6-16-14 7-14 16-14c4 0 7 1 10 3M217 98c3 17 17 22 31 24" stroke="#25f4ee" transform="translate(-3 -3)"/><path d="M217 98v62c0 10-8 17-18 17s-16-6-16-14 7-14 16-14c4 0 7 1 10 3M217 98c3 17 17 22 31 24" stroke="#fe2c55" transform="translate(3 3)"/><path d="M217 98v62c0 10-8 17-18 17s-16-6-16-14 7-14 16-14c4 0 7 1 10 3M217 98c3 17 17 22 31 24" stroke="#f4f1ea"/></g>
-<path d="M196 238h48" stroke="#f4f1ea" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
-<g stroke="#161614" stroke-opacity=".35" stroke-dasharray="3 5" fill="none"><path d="M112 70C130 70 140 100 154 120M112 230C130 230 140 200 154 180M328 150H286"/></g>
-<rect x="50" y="40" width="62" height="62" rx="15" fill="#f4f1ea" stroke="#161614" stroke-width="2"/><rect x="66" y="56" width="30" height="30" rx="8" fill="#161614"/><path d="M76 71h10M81 66v10" stroke="#f4f1ea" stroke-width="2"/><text x="81" y="118">APP</text>
-<rect x="50" y="198" width="62" height="62" rx="9" fill="#f4f1ea" stroke="#161614" stroke-width="2"/><path d="M50 216h62" stroke="#161614" stroke-width="2"/><circle cx="59" cy="207" r="2" fill="#161614"/><rect x="60" y="226" width="42" height="7" fill="#161614"/><rect x="60" y="239" width="26" height="5" fill="#bdb9ad"/><text x="81" y="276">LANDING PAGE</text>
-<circle cx="360" cy="150" r="31" fill="none" stroke="#fe2c55" stroke-width="3"/><circle cx="360" cy="150" r="24" fill="#161614"/><circle cx="360" cy="143" r="7" fill="#f4f1ea"/><path d="M346 164c3-9 25-9 28 0" fill="#f4f1ea"/><text x="360" y="204">CREATOR-LED</text><text x="360" y="216" fill="#161614">(Creator Partnership Ad Campaigns)</text></g></svg>`;
-const SV_G=`<svg viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="#161614" stroke-opacity=".18"><circle cx="220" cy="150" r="104"/><circle cx="220" cy="150" r="136"/></g>
-<g fill="none" stroke-width="22" stroke-dasharray="118 385"><circle cx="220" cy="150" r="80" stroke="#ea4335" transform="rotate(-132 220 150)"/><circle cx="220" cy="150" r="80" stroke="#4285f4" transform="rotate(-42 220 150)"/><circle cx="220" cy="150" r="80" stroke="#34a853" transform="rotate(48 220 150)"/><circle cx="220" cy="150" r="80" stroke="#fbbc05" transform="rotate(138 220 150)"/></g>
-<rect x="188" y="118" width="64" height="64" rx="16" fill="#161614"/><path d="M220 134v26M208 150l12 12 12-12M208 172h24" fill="none" stroke="#f4f1ea" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="76" cy="150" r="7" fill="#fbbc05"/><circle cx="364" cy="150" r="7" fill="#4285f4"/><circle cx="220" cy="22" r="7" fill="#ea4335"/><circle cx="220" cy="278" r="7" fill="#34a853"/>
-<g font-family="DM Mono,monospace" font-size="8.5" letter-spacing="1.4" fill="#77756d"><text x="236" y="26">APP CAMPAIGNS</text><text x="236" y="282">PERFORMANCE</text></g></svg>`;
-const OPT=[['Tracking Setup','Meta Pixel · BOA Events · AppsFlyer'],['Data Collection','Impressions · Clicks · Conversions'],['Performance Analysis','CPM · CTR · CPC · Conversion Cost'],['Campaign Optimization','Budget · Audience · Creative · Campaign Structure'],['Performance Review','Cost Comparison · Conversion Performance']];
-const SV_OPT=`<svg viewBox="0 0 440 330" xmlns="http://www.w3.org/2000/svg"><path d="M30 38V282" stroke="#161614" stroke-width="1.5"/>
-<path d="M414 282H430V38H414" fill="none" stroke="#161614" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M420 31l-8 7 8 7" fill="none" stroke="#161614" stroke-width="1.5"/>
-<text x="436" y="165" transform="rotate(90 436 165)" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" letter-spacing="2" fill="#77756d">REPEAT</text>
-${OPT.map((o,i)=>{const y=38+i*61;return `<circle cx="30" cy="${y}" r="15" fill="${i==4?'#161614':'#f4f1ea'}" stroke="#161614" stroke-width="1.5"/><text x="30" y="${y+4}" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" fill="${i==4?'#f4f1ea':'#161614'}">${i+1}</text><text x="62" y="${y-2}" style="${sty}" font-weight="700" font-size="16" fill="#161614">${o[0]}</text><text x="62" y="${y+15}" font-family="DM Sans,Arial,sans-serif" font-size="11" fill="#4d4b45">${o[1]}</text>`}).join('')}</svg>`;
-
-const PAID_SVG={meta:SV_META,tiktok:SV_TT,google:SV_G,optimization:SV_OPT};
 function pgMeta(c,i,m){return[
- head(c,i,m,vis('meta',SV_META,'Conceptual Meta app advertising illustration')),
+ head(c,i,m,paidSlot('meta')),
  ovw(c,'On Meta I focused on <b>app advertising</b>: opening and funding the account, then configuring, testing and managing campaigns across three categories.',CAT),
  `<div class="pc ctr">${kk('Campaign testing &amp; management')}<ol class="steps"><li><div><b>Account setup</b><em>Opening and preparing the advertising account.</em></div></li><li><div><b>Account funding</b><em>Funding the account so campaigns can run.</em></div></li><li><div><b>Campaign configuration</b><em>Setting up app campaigns for each category.</em></div></li><li><div><b>Initial testing</b><em>Launching test campaigns to see what works.</em></div></li><li><div><b>Ongoing management</b><em>Monitoring results and adjusting. Methods are covered in Optimization &amp; Tracking.</em></div></li></ol></div>`,
  `<div class="pc ctr">${kk('Industry experience')}<p class="lead">App campaigns across three categories.</p><div class="cats">${CAT.map(x=>`<div class="cat"><b>${x}</b><span class="mono">App campaigns</span></div>`).join('')}</div><p class="mono note">[Replace: optional one-line highlight per category — verified only]</p></div>`]}
 function pgTik(c,i,m){return[
- head(c,i,m,vis('tiktok',SV_TT,'Conceptual TikTok advertising illustration')),
+ head(c,i,m,paidSlot('tiktok')),
  ovw(c,'On TikTok I ran <b>app campaigns</b>, <b>website landing-page campaigns</b> and <b>creator-led advertising</b>, handling account setup, funding, testing and management.',['App Campaigns','Website Landing Pages','Creator-led Advertising']),
  `<div class="pc ctr">${kk('Campaigns I ran directly')}${cap('App Campaigns','App advertising, from account setup and funding to campaign testing and management.')}${cap('Website Landing Page Campaigns','Campaigns that send traffic to website landing pages, with testing and ongoing management.')}<p class="mono note">[Replace: categories, goals and any verified results]</p></div>`,
  `<div class="pc ctr">${kk('Creator-led advertising')}<p class="lead">A different delivery format from my own campaigns.</p><div class="cmp"><div>${'<span class="mono">In-house campaigns</span>'}<h3>Run directly</h3><p>Account setup, funding, configuration, testing and management handled by me.</p></div><div class="on"><span class="mono">Creator-led</span><h3>Creator Partnership Ad Campaigns</h3><p>Ads delivered through third-party creators, using creator-made content.</p><p>My part: campaign testing and management for this format. <span class="note">[Replace: confirm exact scope]</span></p></div></div><p class="mono note">Scope: this covers ad delivery with creators only.</p></div>`]}
 function csPage(n,title,type,after,pct,delta){return `<div class="pc ctr">${kk('Featured case study '+n)}<h3 class="cst">${title}</h3><p class="tg">${type}</p><div class="ba"><div class="mono">Cost per conversion</div><div class="row"><span class="mono">Before</span><b class="bf">USD 1.50</b></div><div class="bar g" style="width:100%"></div><div class="row"><span class="mono">After</span><b class="af">${after}</b></div><div class="bar" style="width:${pct}%"></div><div class="dl">${delta}</div></div><dl class="cf"><dt class="mono">Conversion event</dt><dd>[Replace: confirm]</dd><dt class="mono">Period</dt><dd>[Replace: confirm]</dd><dt class="mono">Notes</dt><dd>[Replace: verified details only]</dd></dl></div>`}
 function pgGoogle(c,i,m){return[
- head(c,i,m,vis('google',SV_G,'Conceptual Google app advertising illustration')),
+ head(c,i,m,paidSlot('google')),
  ovw(c,'On Google I focused on <b>app advertising</b>: account setup, funding, campaign testing and ongoing optimization across three categories. Two featured cases follow.',CAT),
  csPage('01','Mobile Game App','Mobile game / card game app','Below USD 0.60',40,'More than 60% lower (bar drawn at USD 0.60)'),
  csPage('02','E-commerce Landing Page','E-commerce website landing page','USD 0.45',30,'70% lower')]}
 function pgOpt(c,i,m){return[
- head(c,i,m,vis('optimization',SV_OPT,'Optimization workflow: tracking setup, data collection, performance analysis, campaign optimization, performance review')),
+ head(c,i,m,paidSlot('optimization')),
  `<div class="pc ctr">${kk('Analyze &amp; optimize')}${cap('A · Data Analysis','',['Monitoring campaign performance','Analyzing CPM, CTR, CPC, conversion rate and cost per conversion','Identifying performance issues and optimization opportunities','Comparing campaign and platform performance'])}${cap('B · Campaign Optimization','',['Budget allocation and adjustment','Audience testing and refinement','Creative testing and comparison','Campaign and ad group optimization','Monitoring results and making data-driven adjustments'])}</div>`,
  `<div class="pc ctr">${kk('Third-party attribution &amp; tracking')}<h2 class="it" style="font-size:2.2em">C · Attribution</h2><p class="lead">Platform numbers are one view. Third-party tracking gives a second.</p><ul>${lis(['Using third-party attribution and tracking platforms such as AppsFlyer','Monitoring campaign attribution and conversion performance','Comparing advertising platform data with third-party tracking data','Identifying discrepancies and evaluating campaign effectiveness'])}</ul></div>`,
  `<div class="pc ctr">${kk('Pixel &amp; event tracking setup')}<h2 class="it" style="font-size:2.2em">D · Event Tracking</h2><p class="lead">Optimization depends on events that fire correctly.</p><ul>${lis(['Meta Pixel installation and configuration','BOA event configuration and testing','Conversion event tracking','Verifying event activity and tracking accuracy'])}</ul></div>`]}
