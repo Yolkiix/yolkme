@@ -289,6 +289,18 @@ box-shadow:2px 0 0 #e7e3d8,4px 0 0 #d4d0c4,6px 0 0 #e7e3d8,20px 30px 50px rgba(0
 .ba .bar{height:.7em;background:var(--ink)}.ba .bar.g{background:#bdb9ad}
 .cf{display:grid;grid-template-columns:auto 1fr;gap:.5em 1.2em;font-size:.88em;border-top:1px solid var(--line);padding-top:.9em}
 .cf dt{color:#7d7a71}.cf dd{line-height:1.45}
+/* ===== VOL.02 centered composition (only pages tagged .ctr) ===== */
+.pc.ctr{align-items:center;justify-content:center;gap:1.2em}
+.pc.ctr .k{justify-content:center}
+.pc.ctr h2,.pc.ctr .tg,.pc.ctr .lead,.pc.ctr .note,.pc.ctr .cst,.pc.ctr .cap h3{text-align:center}
+.pc.ctr .lead{max-width:26em}
+.pc.ctr .fg{width:100%;align-self:stretch}
+.pc.ctr .chips{justify-content:center}
+.pc.ctr .fig figcaption{text-align:center}
+.pc.ctr .ds,.pc.ctr .steps,.pc.ctr .cap,.pc.ctr .cmp,.pc.ctr .ba,.pc.ctr .cf,.pc.ctr .cats,.pc.ctr>ul{width:100%;max-width:26em}
+.pc.ctr .ds{flex-direction:column;align-items:center;gap:.5em;text-align:center}
+.pc.ctr .cf{margin-inline:auto}
+.single .pc.ctr{padding-top:2.4em;padding-bottom:2.4em}
 @media(prefers-reduced-motion:reduce){
  html{scroll-behavior:auto}
  *{transition-duration:.01ms!important;animation-duration:.01ms!important}
@@ -399,13 +411,34 @@ const WORK=[['—','Deliverables'],['—','Reach'],['—','Result']];
 
 /* ===== VOL.02 BEYOND NUMBERS — custom pages. No uploads needed: every visual is drawn in code, no real dashboards. =====
    Average daily spend: set  ds:'To be updated'  (default), a approved range like  ds:'USD 500–1,000 / day (approved range)',  or  ds:null  to hide the field. */
+/* ============ VOL.02 IMAGE SETTINGS — EDIT HERE ============
+   Each of the four Paid Advertising visuals is controlled by one entry below.
+   • To use your own picture: upload it to PAID_IMG_DIR (images/paid-media/) and type its file name in  file:'...'
+     (or type a full path such as 'images/paid-media/my-visual.jpg').  Example:  file:'meta-ads-1.jpg'
+   • Leave  file:''  to keep the built-in conceptual illustration. If a file is missing or fails to load, the built-in illustration is shown instead.
+   • alt = description for screen readers · cap = small caption under the picture (cap:'' hides it).
+   • Pictures are never cropped or stretched: they scale down to fit the page and keep their own aspect ratio (any ratio works).
+   • Do not publish real Ads Manager screenshots, budgets or client data. */
+const PAID_IMG_DIR='images/paid-media/';
+const PAID_IMG={
+ meta:{file:'',alt:'Meta Ads — conceptual visual',cap:'Meta Ads visual'},               /* suggested name: meta-ads-1.jpg */
+ tiktok:{file:'',alt:'TikTok Ads — conceptual visual',cap:'TikTok Ads visual'},         /* suggested name: tiktok-ads-1.jpg */
+ google:{file:'',alt:'Google Ads — conceptual visual',cap:'Google Ads visual'},         /* suggested name: google-ads-1.jpg */
+ optimization:{file:'',alt:'Optimization workflow infographic',cap:'Optimization workflow'} /* suggested name: optimization-tracking-1.jpg */
+};
+const PAID_CAP={meta:'Conceptual illustration · not a real account',tiktok:'Conceptual illustration · not a real ad',google:'Conceptual illustration · not a real account',optimization:'Original workflow · not a platform screenshot'};
+const paidSrc=k=>{const f=PAID_IMG[k].file;return f?(f.includes('/')?f:PAID_IMG_DIR+f):''};
+function paidFb(el){const m=el.closest('.m');if(m)m.innerHTML=PAID_SVG[el.dataset.k]}
+function vis(k,svg,lbl){const c=PAID_IMG[k],src=paidSrc(k);
+ if(src)return `<div class="fg"><figure class="fig"><div class="m"><img src="${src}" alt="${c.alt}" data-k="${k}" loading="lazy" onerror="paidFb(this)"></div>${c.cap?`<figcaption class="mono">${c.cap}</figcaption>`:''}</figure></div>`;
+ return fig(svg,PAID_CAP[k],lbl)}
 const kk=t=>`<div class="mono k"><i></i>${t}</div>`;
 const fig=(svg,cap,lbl)=>`<div class="fg"><figure class="fig" role="img" aria-label="${lbl}"><div class="m">${svg}</div><figcaption class="mono">${cap}</figcaption></figure></div>`;
-const head=(c,i,m,body)=>`<div class="pc op v${i%2}">${kk(`Chapter ${pad(i+1)} · ${m.sub}`)}<div class="mk">${c.mk}</div><h2>${c.n}</h2><p class="tg">${c.t}</p>${body}</div>`;
+const head=(c,i,m,body)=>`<div class="pc op ctr v${i%2}">${kk(`Chapter ${pad(i+1)} · ${m.sub}`)}<div class="mk">${c.mk}</div><h2>${c.n}</h2><p class="tg">${c.t}</p>${body}</div>`;
 const dsf=c=>c.ds===null?'':`<div class="ds"><span class="mono">Average Daily Spend:</span><b>${c.ds||'To be updated'}</b></div>`;
 const chips=a=>`<div class="chips">${a.map(x=>`<span>${x}</span>`).join('')}</div>`;
 const CAT=['Finance','Gaming','Entertainment &amp; Interactive'];
-const ovw=(c,lead,tags)=>`<div class="pc">${kk('Platform overview')}<p class="lead">${lead}</p>${chips(tags)}${dsf(c)}<p class="mono note">[Replace: market, period and your role — confirmed details only. Spend: approved range or leave as is.]</p></div>`;
+const ovw=(c,lead,tags)=>`<div class="pc ctr">${kk('Platform overview')}<p class="lead">${lead}</p>${chips(tags)}${dsf(c)}<p class="mono note">[Replace: market, period and your role — confirmed details only. Spend: approved range or leave as is.]</p></div>`;
 const lis=a=>a.map(x=>`<li>${x}</li>`).join('');
 const cap=(h,p,l)=>`<div class="cap"><h3>${h}</h3>${p?`<p>${p}</p>`:''}${l?`<ul>${lis(l)}</ul>`:''}</div>`;
 const sty='font-family:var(--serif)';
@@ -435,27 +468,28 @@ const SV_OPT=`<svg viewBox="0 0 440 330" xmlns="http://www.w3.org/2000/svg"><pat
 <text x="436" y="165" transform="rotate(90 436 165)" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" letter-spacing="2" fill="#77756d">REPEAT</text>
 ${OPT.map((o,i)=>{const y=38+i*61;return `<circle cx="30" cy="${y}" r="15" fill="${i==4?'#161614':'#f4f1ea'}" stroke="#161614" stroke-width="1.5"/><text x="30" y="${y+4}" text-anchor="middle" font-family="DM Mono,monospace" font-size="11" fill="${i==4?'#f4f1ea':'#161614'}">${i+1}</text><text x="62" y="${y-2}" style="${sty}" font-weight="700" font-size="16" fill="#161614">${o[0]}</text><text x="62" y="${y+15}" font-family="DM Sans,Arial,sans-serif" font-size="11" fill="#4d4b45">${o[1]}</text>`}).join('')}</svg>`;
 
+const PAID_SVG={meta:SV_META,tiktok:SV_TT,google:SV_G,optimization:SV_OPT};
 function pgMeta(c,i,m){return[
- head(c,i,m,fig(SV_META,'Conceptual illustration · not a real account','Conceptual Meta app advertising illustration')),
+ head(c,i,m,vis('meta',SV_META,'Conceptual Meta app advertising illustration')),
  ovw(c,'On Meta I focused on <b>app advertising</b>: opening and funding the account, then configuring, testing and managing campaigns across three categories.',CAT),
- `<div class="pc">${kk('Campaign testing &amp; management')}<ol class="steps"><li><div><b>Account setup</b><em>Opening and preparing the advertising account.</em></div></li><li><div><b>Account funding</b><em>Funding the account so campaigns can run.</em></div></li><li><div><b>Campaign configuration</b><em>Setting up app campaigns for each category.</em></div></li><li><div><b>Initial testing</b><em>Launching test campaigns to see what works.</em></div></li><li><div><b>Ongoing management</b><em>Monitoring results and adjusting. Methods are covered in Optimization &amp; Tracking.</em></div></li></ol></div>`,
- `<div class="pc">${kk('Industry experience')}<p class="lead">App campaigns across three categories.</p><div>${CAT.map(x=>`<div class="cat"><b>${x}</b><span class="mono">App campaigns</span></div>`).join('')}</div><p class="mono note">[Replace: optional one-line highlight per category — verified only]</p></div>`]}
+ `<div class="pc ctr">${kk('Campaign testing &amp; management')}<ol class="steps"><li><div><b>Account setup</b><em>Opening and preparing the advertising account.</em></div></li><li><div><b>Account funding</b><em>Funding the account so campaigns can run.</em></div></li><li><div><b>Campaign configuration</b><em>Setting up app campaigns for each category.</em></div></li><li><div><b>Initial testing</b><em>Launching test campaigns to see what works.</em></div></li><li><div><b>Ongoing management</b><em>Monitoring results and adjusting. Methods are covered in Optimization &amp; Tracking.</em></div></li></ol></div>`,
+ `<div class="pc ctr">${kk('Industry experience')}<p class="lead">App campaigns across three categories.</p><div class="cats">${CAT.map(x=>`<div class="cat"><b>${x}</b><span class="mono">App campaigns</span></div>`).join('')}</div><p class="mono note">[Replace: optional one-line highlight per category — verified only]</p></div>`]}
 function pgTik(c,i,m){return[
- head(c,i,m,fig(SV_TT,'Conceptual illustration · not a real ad','Conceptual TikTok advertising illustration')),
+ head(c,i,m,vis('tiktok',SV_TT,'Conceptual TikTok advertising illustration')),
  ovw(c,'On TikTok I ran <b>app campaigns</b>, <b>website landing-page campaigns</b> and <b>creator-led advertising</b>, handling account setup, funding, testing and management.',['App Campaigns','Website Landing Pages','Creator-led Advertising']),
- `<div class="pc">${kk('Campaigns I ran directly')}${cap('App Campaigns','App advertising, from account setup and funding to campaign testing and management.')}${cap('Website Landing Page Campaigns','Campaigns that send traffic to website landing pages, with testing and ongoing management.')}<p class="mono note">[Replace: categories, goals and any verified results]</p></div>`,
- `<div class="pc">${kk('Creator-led advertising')}<p class="lead">A different delivery format from my own campaigns.</p><div class="cmp"><div>${'<span class="mono">In-house campaigns</span>'}<h3>Run directly</h3><p>Account setup, funding, configuration, testing and management handled by me.</p></div><div class="on"><span class="mono">Creator-led</span><h3>Creator Partnership Ad Campaigns</h3><p>Ads delivered through third-party creators, using creator-made content.</p><p>My part: campaign testing and management for this format. <span class="note">[Replace: confirm exact scope]</span></p></div></div><p class="mono note">Scope: this covers ad delivery with creators only.</p></div>`]}
-function csPage(n,title,type,after,pct,delta){return `<div class="pc">${kk('Featured case study '+n)}<h3 class="cst">${title}</h3><p class="tg">${type}</p><div class="ba"><div class="mono">Cost per conversion</div><div class="row"><span class="mono">Before</span><b class="bf">USD 1.50</b></div><div class="bar g" style="width:100%"></div><div class="row"><span class="mono">After</span><b class="af">${after}</b></div><div class="bar" style="width:${pct}%"></div><div class="dl">${delta}</div></div><dl class="cf"><dt class="mono">Conversion event</dt><dd>[Replace: confirm]</dd><dt class="mono">Period</dt><dd>[Replace: confirm]</dd><dt class="mono">Notes</dt><dd>[Replace: verified details only]</dd></dl></div>`}
+ `<div class="pc ctr">${kk('Campaigns I ran directly')}${cap('App Campaigns','App advertising, from account setup and funding to campaign testing and management.')}${cap('Website Landing Page Campaigns','Campaigns that send traffic to website landing pages, with testing and ongoing management.')}<p class="mono note">[Replace: categories, goals and any verified results]</p></div>`,
+ `<div class="pc ctr">${kk('Creator-led advertising')}<p class="lead">A different delivery format from my own campaigns.</p><div class="cmp"><div>${'<span class="mono">In-house campaigns</span>'}<h3>Run directly</h3><p>Account setup, funding, configuration, testing and management handled by me.</p></div><div class="on"><span class="mono">Creator-led</span><h3>Creator Partnership Ad Campaigns</h3><p>Ads delivered through third-party creators, using creator-made content.</p><p>My part: campaign testing and management for this format. <span class="note">[Replace: confirm exact scope]</span></p></div></div><p class="mono note">Scope: this covers ad delivery with creators only.</p></div>`]}
+function csPage(n,title,type,after,pct,delta){return `<div class="pc ctr">${kk('Featured case study '+n)}<h3 class="cst">${title}</h3><p class="tg">${type}</p><div class="ba"><div class="mono">Cost per conversion</div><div class="row"><span class="mono">Before</span><b class="bf">USD 1.50</b></div><div class="bar g" style="width:100%"></div><div class="row"><span class="mono">After</span><b class="af">${after}</b></div><div class="bar" style="width:${pct}%"></div><div class="dl">${delta}</div></div><dl class="cf"><dt class="mono">Conversion event</dt><dd>[Replace: confirm]</dd><dt class="mono">Period</dt><dd>[Replace: confirm]</dd><dt class="mono">Notes</dt><dd>[Replace: verified details only]</dd></dl></div>`}
 function pgGoogle(c,i,m){return[
- head(c,i,m,fig(SV_G,'Conceptual illustration · not a real account','Conceptual Google app advertising illustration')),
+ head(c,i,m,vis('google',SV_G,'Conceptual Google app advertising illustration')),
  ovw(c,'On Google I focused on <b>app advertising</b>: account setup, funding, campaign testing and ongoing optimization across three categories. Two featured cases follow.',CAT),
  csPage('01','Mobile Game App','Mobile game / card game app','Below USD 0.60',40,'More than 60% lower (bar drawn at USD 0.60)'),
  csPage('02','E-commerce Landing Page','E-commerce website landing page','USD 0.45',30,'70% lower')]}
 function pgOpt(c,i,m){return[
- head(c,i,m,fig(SV_OPT,'Original workflow · not a platform screenshot','Optimization workflow: tracking setup, data collection, performance analysis, campaign optimization, performance review')),
- `<div class="pc">${kk('Analyze &amp; optimize')}${cap('A · Data Analysis','',['Monitoring campaign performance','Analyzing CPM, CTR, CPC, conversion rate and cost per conversion','Identifying performance issues and optimization opportunities','Comparing campaign and platform performance'])}${cap('B · Campaign Optimization','',['Budget allocation and adjustment','Audience testing and refinement','Creative testing and comparison','Campaign and ad group optimization','Monitoring results and making data-driven adjustments'])}</div>`,
- `<div class="pc">${kk('Third-party attribution &amp; tracking')}<h2 class="it" style="font-size:2.2em">C · Attribution</h2><p class="lead">Platform numbers are one view. Third-party tracking gives a second.</p><ul>${lis(['Using third-party attribution and tracking platforms such as AppsFlyer','Monitoring campaign attribution and conversion performance','Comparing advertising platform data with third-party tracking data','Identifying discrepancies and evaluating campaign effectiveness'])}</ul></div>`,
- `<div class="pc">${kk('Pixel &amp; event tracking setup')}<h2 class="it" style="font-size:2.2em">D · Event Tracking</h2><p class="lead">Optimization depends on events that fire correctly.</p><ul>${lis(['Meta Pixel installation and configuration','BOA event configuration and testing','Conversion event tracking','Verifying event activity and tracking accuracy'])}</ul></div>`]}
+ head(c,i,m,vis('optimization',SV_OPT,'Optimization workflow: tracking setup, data collection, performance analysis, campaign optimization, performance review')),
+ `<div class="pc ctr">${kk('Analyze &amp; optimize')}${cap('A · Data Analysis','',['Monitoring campaign performance','Analyzing CPM, CTR, CPC, conversion rate and cost per conversion','Identifying performance issues and optimization opportunities','Comparing campaign and platform performance'])}${cap('B · Campaign Optimization','',['Budget allocation and adjustment','Audience testing and refinement','Creative testing and comparison','Campaign and ad group optimization','Monitoring results and making data-driven adjustments'])}</div>`,
+ `<div class="pc ctr">${kk('Third-party attribution &amp; tracking')}<h2 class="it" style="font-size:2.2em">C · Attribution</h2><p class="lead">Platform numbers are one view. Third-party tracking gives a second.</p><ul>${lis(['Using third-party attribution and tracking platforms such as AppsFlyer','Monitoring campaign attribution and conversion performance','Comparing advertising platform data with third-party tracking data','Identifying discrepancies and evaluating campaign effectiveness'])}</ul></div>`,
+ `<div class="pc ctr">${kk('Pixel &amp; event tracking setup')}<h2 class="it" style="font-size:2.2em">D · Event Tracking</h2><p class="lead">Optimization depends on events that fire correctly.</p><ul>${lis(['Meta Pixel installation and configuration','BOA event configuration and testing','Conversion event tracking','Verifying event activity and tracking accuracy'])}</ul></div>`]}
 
 
 const MAGS=[
